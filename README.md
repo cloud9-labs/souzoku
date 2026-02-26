@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 相続書類管理システム
 
-## Getting Started
+相続税申告の書類収集を、もれなく・確実に管理するWebアプリケーション。
 
-First, run the development server:
+## 機能概要
+
+- **5ステップヒアリングウィザード** — 被相続人・相続人・財産・特例情報を入力
+- **自動書類リスト生成** — TIER1（必須）/ TIER2（財産別）/ TIER3（特例・控除）で分類
+- **書類チェックリスト** — ステータス管理（未依頼→依頼済→受取済→確認済）
+- **申告期限タイムライン** — 逝去から10ヶ月の期限を6マイルストーンで管理
+- **リマインダーメール** — 4段階エスカレーション（7/30/90/240日）
+
+## 技術スタック
+
+- **フロントエンド**: Next.js 16 (App Router) + TypeScript + Tailwind CSS + shadcn/ui
+- **バックエンド**: Supabase (PostgreSQL + Auth + RLS)
+- **メール**: Resend API
+- **認証**: Supabase Auth + Next.js proxy (Row Level Security)
+
+## セットアップ
 
 ```bash
+npm install
+cp .env.local.example .env.local  # Supabase・Resend の認証情報を設定
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 環境変数 (.env.local)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+RESEND_API_KEY=
+RESEND_FROM_EMAIL=noreply@yourdomain.com
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### DBマイグレーション
 
-## Learn More
+Supabase ダッシュボードの SQL エディタで以下を実行:
 
-To learn more about Next.js, take a look at the following resources:
+```
+supabase/migrations/001_initial_schema.sql
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## TAISUN Agent セットアップ
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+ln -s ~/taisun_agent/.claude .claude
+ln -s ~/taisun_agent/.mcp.json .mcp.json
+cd ~/taisun_agent && git pull origin main && npm install && npm run build:all
+```

@@ -39,7 +39,7 @@ export default function DashboardPage() {
     fetch('/api/cases')
       .then(r => r.json())
       .then(data => {
-        setCases(data)
+        setCases(Array.isArray(data) ? data : [])
         setLoading(false)
       })
       .catch(() => setLoading(false))

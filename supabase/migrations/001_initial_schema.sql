@@ -50,6 +50,10 @@ CREATE TABLE cases (
   -- 顧客情報
   client_name text NOT NULL DEFAULT '',
   client_email text NOT NULL DEFAULT '',
+  client_relationship text NOT NULL DEFAULT '',
+  client_phone text NOT NULL DEFAULT '',
+  client_address text NOT NULL DEFAULT '',
+  heirs jsonb NOT NULL DEFAULT '[]',
 
   -- ステータス
   status text NOT NULL DEFAULT 'active'

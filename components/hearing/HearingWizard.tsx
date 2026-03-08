@@ -12,11 +12,11 @@ import { Step4Exemptions } from './Step4Exemptions'
 import { Step5Current } from './Step5Current'
 import { Button } from '@/components/ui/button'
 
-const STEP_LABELS = ['被相続人情報', '相続人確定', '財産概況', '特例・控除', '依頼者情報']
+const STEP_LABELS = ['依頼者情報', '被相続人情報', '相続人確定', '財産概況', '特例・控除']
 
 const DEFAULT_VALUES: HearingFormData = {
   deceased_name: '',
-  deceased_birth_date: '',
+  deceased_birth_date: '1950-01-01',
   deceased_death_date: '',
   deceased_address: '',
   has_spouse: false,
@@ -40,8 +40,12 @@ const DEFAULT_VALUES: HearingFormData = {
   has_souzoku_kazeijoken: false,
   has_disabled_heir: false,
   has_minor_heir: false,
-  client_email: '',
   client_name: '',
+  client_email: '',
+  client_relationship: '',
+  client_phone: '',
+  client_address: '',
+  heirs: [],
 }
 
 export function HearingWizard() {
@@ -49,17 +53,17 @@ export function HearingWizard() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const router = useRouter()
 
-  const { control, handleSubmit, trigger, formState: { errors } } = useForm<HearingFormData>({
+  const { control, handleSubmit, trigger, setValue, formState: { errors } } = useForm<HearingFormData>({
     defaultValues: DEFAULT_VALUES,
     mode: 'onBlur',
   })
 
   const STEP_VALIDATE_FIELDS: Record<number, (keyof HearingFormData)[]> = {
-    1: ['deceased_name', 'deceased_birth_date', 'deceased_death_date', 'deceased_address'],
-    2: ['children_count'],
-    3: [],
+    1: ['client_name', 'client_email', 'client_relationship', 'client_phone'],
+    2: ['deceased_name', 'deceased_birth_date', 'deceased_death_date', 'deceased_address'],
+    3: ['children_count'],
     4: [],
-    5: ['client_name', 'client_email'],
+    5: [],
   }
 
   const handleNext = async () => {
@@ -116,11 +120,11 @@ export function HearingWizard() {
 
       {/* ステップコンテンツ */}
       <div className="bg-white rounded-2xl shadow-sm border p-6 min-h-[500px]">
-        {step === 1 && <Step1Deceased control={control} errors={errors as Record<string, { message?: string }>} />}
-        {step === 2 && <Step2Heirs control={control} errors={errors as Record<string, { message?: string }>} />}
-        {step === 3 && <Step3Assets control={control} />}
-        {step === 4 && <Step4Exemptions control={control} />}
-        {step === 5 && <Step5Current control={control} errors={errors as Record<string, { message?: string }>} />}
+        {step === 1 && <Step5Current control={control} errors={errors as Record<string, { message?: string }>} setValue={setValue} />}
+        {step === 2 && <Step1Deceased control={control} errors={errors as Record<string, { message?: string }>} setValue={setValue} />}
+        {step === 3 && <Step2Heirs control={control} errors={errors as Record<string, { message?: string }>} />}
+        {step === 4 && <Step3Assets control={control} />}
+        {step === 5 && <Step4Exemptions control={control} />}
       </div>
 
       {/* ナビゲーションボタン */}

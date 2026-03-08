@@ -7,7 +7,7 @@ import { format, differenceInDays } from 'date-fns'
 import { ja } from 'date-fns/locale'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { ArrowLeft, Clock, Mail, Calendar, ChevronRight } from 'lucide-react'
+import { ArrowLeft, Clock, Mail, Calendar, ChevronRight, Phone, MapPin, Users } from 'lucide-react'
 import { DocumentChecklist } from '@/components/documents/DocumentChecklist'
 import type { Case, Document } from '@/types/case'
 
@@ -86,16 +86,25 @@ export default function CaseDetailPage() {
           <div>
             <h1 className="text-xl font-bold text-gray-900">{caseData.deceased_name} 様（被相続人）</h1>
             <p className="text-sm text-gray-500 mt-1">
-              依頼人: {caseData.client_name} 様　|　{caseData.client_email}　|　逝去日: {deathDateFormatted}
+              依頼人: {caseData.client_name} 様{caseData.client_relationship ? `（${caseData.client_relationship}）` : ''}　|　逝去日: {deathDateFormatted}
             </p>
           </div>
-          <Link href={`/dashboard/cases/${id}/timeline`}>
-            <Button variant="outline" size="sm">
-              <Calendar className="w-4 h-4 mr-1" />
-              タイムライン
-              <ChevronRight className="w-3 h-3 ml-1" />
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => window.open(`/dashboard/cases/${id}/print`, '_blank')}
+            >
+              🖨️ 書類一覧を印刷
             </Button>
-          </Link>
+            <Link href={`/dashboard/cases/${id}/timeline`}>
+              <Button variant="outline" size="sm">
+                <Calendar className="w-4 h-4 mr-1" />
+                タイムライン
+                <ChevronRight className="w-3 h-3 ml-1" />
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -124,10 +133,65 @@ export default function CaseDetailPage() {
         </div>
       </div>
 
+      {/* 依頼者情報 */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <Users className="w-4 h-4" />
+            依頼者情報
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2 text-sm">
+          <div className="grid grid-cols-2 gap-x-8 gap-y-2">
+            <div className="flex items-center gap-2 text-gray-600">
+              <span className="font-medium w-20">氏名</span>
+              <span>{caseData.client_name} 様</span>
+            </div>
+            {caseData.client_relationship && (
+              <div className="flex items-center gap-2 text-gray-600">
+                <span className="font-medium w-20">続柄</span>
+                <span>{caseData.client_relationship}</span>
+              </div>
+            )}
+            {caseData.client_phone && (
+              <div className="flex items-center gap-2 text-gray-600">
+                <Phone className="w-3 h-3 shrink-0" />
+                <span>{caseData.client_phone}</span>
+              </div>
+            )}
+            <div className="flex items-center gap-2 text-gray-600">
+              <Mail className="w-3 h-3 shrink-0" />
+              <span>{caseData.client_email}</span>
+            </div>
+            {caseData.client_address && (
+              <div className="flex items-center gap-2 text-gray-600 col-span-2">
+                <MapPin className="w-3 h-3 shrink-0" />
+                <span>{caseData.client_address}</span>
+              </div>
+            )}
+          </div>
+
+          {caseData.heirs && caseData.heirs.length > 0 && (
+            <div className="mt-3 pt-3 border-t">
+              <p className="font-medium text-gray-700 mb-2">相続人一覧</p>
+              <div className="flex flex-wrap gap-2">
+                {caseData.heirs.map((heir, i) => (
+                  <span key={i} className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 rounded text-xs text-gray-700">
+                    {heir.name || '（氏名未入力）'}
+                    {heir.relationship && <span className="text-gray-400">・{heir.relationship}</span>}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* 書類チェックリスト（進捗バーを内包） */}
       <DocumentChecklist
         initialDocuments={caseData.documents}
         caseId={id}
+        filingDeadline={caseData.filing_deadline}
       />
 
       {/* リマインダー送信 */}

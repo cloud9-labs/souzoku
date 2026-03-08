@@ -1,11 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { generateChecklist } from '@/lib/document-engine/generate-checklist'
+import { saveDevCase } from '@/lib/dev-store'
+import { encrypt, encryptJson } from '@/lib/crypto'
 import type { HearingFormData } from '@/types/case'
 import type { DocumentDefinition } from '@/lib/document-engine/document-master'
 
+const DEV_BYPASS = process.env.DEV_BYPASS_AUTH === 'true'
+const DEV_USER_ID = 'dev-user-00000000-0000-0000-0000-000000000000'
+
 export async function GET() {
   try {
+    if (DEV_BYPASS) {
+      // 開発用：Supabase未設定時は空配列を返す
+      return NextResponse.json([], { status: 200 })
+    }
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json([], { status: 200 })
@@ -24,13 +33,22 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: '認証が必要です' }, { status: 401 })
-
   const body = await request.json()
   const formData: HearingFormData = body.caseData
   const checklist: DocumentDefinition[] = body.documents ?? generateChecklist(formData)
+
+  // 開発用バイパス：Supabase未設定時はダミーIDで成功レスポンスを返す
+  if (DEV_BYPASS) {
+    const deathDate = formData.deceased_death_date ? new Date(formData.deceased_death_date) : new Date()
+    const deadline = new Date(deathDate)
+    deadline.setMonth(deadline.getMonth() + 10)
+    saveDevCase('dev-case-preview', formData, deadline.toISOString().split('T')[0])
+    return NextResponse.json({ caseId: 'dev-case-preview' }, { status: 201 })
+  }
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: '認証が必要です' }, { status: 401 })
 
   // cases テーブルへ挿入
   const { data: caseData, error: caseError } = await supabase
@@ -63,7 +81,11 @@ export async function POST(request: NextRequest) {
       has_disabled_heir: formData.has_disabled_heir,
       has_minor_heir: formData.has_minor_heir,
       client_name: formData.client_name,
-      client_email: formData.client_email,
+      client_email: encrypt(formData.client_email ?? ''),
+      client_relationship: formData.client_relationship,
+      client_phone: encrypt(formData.client_phone ?? ''),
+      client_address: encrypt(formData.client_address ?? ''),
+      heirs: encryptJson(formData.heirs),
     })
     .select()
     .single()

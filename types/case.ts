@@ -1,5 +1,10 @@
 export type WillType = 'notarized' | 'holographic_self' | 'holographic_registry' | 'none'
 
+export interface HeirEntry {
+  name: string
+  relationship: string
+}
+
 export type SmallLandType =
   | 'residential_spouse'
   | 'residential_cohabitant'
@@ -43,6 +48,10 @@ export interface Case {
   has_minor_heir: boolean
   client_name: string
   client_email: string
+  client_relationship: string
+  client_phone: string
+  client_address: string
+  heirs: HeirEntry[]
   status: 'active' | 'completed' | 'archived'
   created_at: string
   updated_at: string
@@ -65,6 +74,17 @@ export interface Document {
   received_at: string | null
   created_at: string
   updated_at: string
+}
+
+export interface DocumentUpload {
+  id: string
+  document_id: string
+  case_id: string
+  file_name: string
+  file_path: string
+  file_size: number
+  mime_type: string
+  uploaded_at: string
 }
 
 export interface Notification {
@@ -113,6 +133,11 @@ export interface HearingFormData {
   has_disabled_heir: boolean
   has_minor_heir: boolean
   // STEP 5
-  client_email: string
   client_name: string
+  client_email: string
+  client_relationship: string
+  client_phone: string
+  client_address: string
+  // STEP 2 additions
+  heirs: HeirEntry[]
 }

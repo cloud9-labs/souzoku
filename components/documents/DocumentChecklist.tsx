@@ -15,9 +15,10 @@ const TIER_LABELS: Record<DocumentTier, string> = {
 interface Props {
   initialDocuments: Document[]
   caseId: string
+  filingDeadline?: string
 }
 
-export function DocumentChecklist({ initialDocuments, caseId }: Props) {
+export function DocumentChecklist({ initialDocuments, caseId, filingDeadline }: Props) {
   const [documents, setDocuments] = useState<Document[]>(initialDocuments)
   const [filterStatus, setFilterStatus] = useState<DocumentStatus | 'all'>('all')
 
@@ -83,7 +84,7 @@ export function DocumentChecklist({ initialDocuments, caseId }: Props) {
             ) : (
               <div className="space-y-2">
                 {docs.map((doc) => (
-                  <DocumentCard key={doc.id} doc={doc} onStatusChange={handleStatusChange} />
+                  <DocumentCard key={doc.id} doc={doc} onStatusChange={handleStatusChange} filingDeadline={filingDeadline} />
                 ))}
               </div>
             )}

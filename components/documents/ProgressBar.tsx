@@ -19,7 +19,7 @@ const TIER_CONFIG = {
 export function ProgressBar({ progress }: Props) {
   const totalDocs = progress.reduce((sum, p) => sum + p.total, 0)
   const totalReceived = progress.reduce((sum, p) => sum + p.received, 0)
-  const overallRate = totalDocs === 0 ? 100 : Math.round((totalReceived / totalDocs) * 100)
+  const overallRate = totalDocs === 0 ? 0 : Math.round((totalReceived / totalDocs) * 100)
 
   return (
     <div className="space-y-4">

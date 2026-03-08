@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Document, DocumentStatus } from '@/types/case'
+import { FileUploadArea } from './FileUploadArea'
 
 const STATUS_CONFIG: Record<DocumentStatus, { label: string; color: string; next: DocumentStatus | null }> = {
   not_requested: { label: '未依頼', color: 'bg-gray-100 text-gray-600', next: 'requested' },
@@ -19,12 +20,22 @@ const TIER_BADGE: Record<number, string> = {
 interface Props {
   doc: Document
   onStatusChange: (id: string, status: DocumentStatus) => void
+  filingDeadline?: string
 }
 
-export function DocumentCard({ doc, onStatusChange }: Props) {
+export function DocumentCard({ doc, onStatusChange, filingDeadline }: Props) {
   const [showWhy, setShowWhy] = useState(false)
   const cfg = STATUS_CONFIG[doc.status]
   const nextStatus = cfg.next
+
+  const deadlineDisplay = (() => {
+    if (!filingDeadline) return null
+    const d = new Date(filingDeadline)
+    const daysLeft = Math.floor((d.getTime() - Date.now()) / 86400000)
+    const label = `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`
+    const urgency = daysLeft < 30 ? 'text-red-600' : daysLeft < 90 ? 'text-orange-600' : 'text-blue-600'
+    return { label, urgency }
+  })()
 
   return (
     <div className={`border rounded-xl p-4 transition-all ${doc.status === 'confirmed' ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-white'}`}>
@@ -58,6 +69,11 @@ export function DocumentCard({ doc, onStatusChange }: Props) {
             <span>📍 {doc.obtain_from}</span>
             <span>💰 {doc.estimated_cost}</span>
             <span>⏱️ {doc.estimated_days}</span>
+            {deadlineDisplay && (
+              <span className={`font-medium ${deadlineDisplay.urgency}`}>
+                📅 申告期限：{deadlineDisplay.label}まで
+              </span>
+            )}
           </div>
 
           {doc.notes && (
@@ -89,6 +105,15 @@ export function DocumentCard({ doc, onStatusChange }: Props) {
               {doc.why_needed}
             </div>
           )}
+
+          <FileUploadArea
+            documentId={doc.id}
+            onUploaded={() => {
+              if (doc.status === 'not_requested') {
+                onStatusChange(doc.id, 'received')
+              }
+            }}
+          />
         </div>
       </div>
     </div>

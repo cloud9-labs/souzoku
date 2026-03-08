@@ -53,11 +53,14 @@ export function generateChecklist(caseData: Partial<Case>): DocumentDefinition[]
     if (landType === 'residential_cohabitant') documents.push(...TIER3_DOCUMENTS.small_land_cohabitant)
     if (landType === 'residential_homeless_child') documents.push(...TIER3_DOCUMENTS.small_land_homeless_child)
     if (landType === 'residential_nursing_home') documents.push(...TIER3_DOCUMENTS.small_land_nursing_home)
+    if (landType === 'business') documents.push(...TIER3_DOCUMENTS.small_land_business)
+    if (landType === 'rental') documents.push(...TIER3_DOCUMENTS.small_land_rental)
   }
 
   if (caseData.has_prior_gifts) documents.push(...TIER3_DOCUMENTS.prior_gifts)
   if (caseData.has_souzoku_kazeijoken) documents.push(...TIER3_DOCUMENTS.souzoku_kazeijoken)
   if (caseData.has_disabled_heir) documents.push(...TIER3_DOCUMENTS.disabled_heir)
+  if (caseData.has_minor_heir) documents.push(...TIER3_DOCUMENTS.minor_heir)
 
   // 重複除去
   const seen = new Set<string>()

@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect } from 'react'
-import { Control, Controller, useWatch } from 'react-hook-form'
+import { useState } from 'react'
+import { Control, Controller, UseFormSetValue, useWatch } from 'react-hook-form'
 import { addMonths, differenceInDays, parseISO, isValid } from 'date-fns'
 import { formatJpDate } from '@/lib/utils/deadline'
 import { HearingFormData } from '@/types/case'
@@ -12,9 +12,48 @@ import { Card, CardContent } from '@/components/ui/card'
 interface Props {
   control: Control<HearingFormData>
   errors: Record<string, { message?: string }>
+  setValue: UseFormSetValue<HearingFormData>
 }
 
-export function Step1Deceased({ control, errors }: Props) {
+async function fetchAddressByPostalCode(code: string): Promise<string | null> {
+  const digits = code.replace(/-/g, '')
+  if (digits.length !== 7) return null
+  const res = await fetch(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${digits}`)
+  if (!res.ok) return null
+  const json = await res.json()
+  if (!json.results?.[0]) return null
+  const { address1, address2, address3 } = json.results[0]
+  return `${address1}${address2}${address3}`
+}
+
+export function Step1Deceased({ control, errors, setValue }: Props) {
+  const [postalCode, setPostalCode] = useState('')
+  const [isLookingUp, setIsLookingUp] = useState(false)
+  const [lookupError, setLookupError] = useState('')
+
+  const handlePostalCodeChange = async (value: string) => {
+    const formatted = value.replace(/[^0-9-]/g, '')
+    setPostalCode(formatted)
+    setLookupError('')
+
+    const digits = formatted.replace(/-/g, '')
+    if (digits.length === 7) {
+      setIsLookingUp(true)
+      try {
+        const address = await fetchAddressByPostalCode(digits)
+        if (address) {
+          setValue('deceased_address', address, { shouldValidate: true })
+        } else {
+          setLookupError('住所が見つかりませんでした')
+        }
+      } catch {
+        setLookupError('住所の取得に失敗しました')
+      } finally {
+        setIsLookingUp(false)
+      }
+    }
+  }
+
   const deathDate = useWatch({ control, name: 'deceased_death_date' })
 
   const deadline = (() => {
@@ -29,7 +68,7 @@ export function Step1Deceased({ control, errors }: Props) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-bold text-gray-800">STEP 1：被相続人の情報</h2>
+        <h2 className="text-xl font-bold text-gray-800">STEP 2：被相続人の情報</h2>
         <p className="text-sm text-gray-500 mt-1">ご逝去された方の基本情報を入力してください</p>
       </div>
 
@@ -90,6 +129,23 @@ export function Step1Deceased({ control, errors }: Props) {
             />
             {errors.deceased_death_date && <p className="text-red-500 text-xs mt-1">{errors.deceased_death_date.message}</p>}
           </div>
+        </div>
+
+        <div>
+          <Label htmlFor="deceased_postal_code">郵便番号</Label>
+          <div className="flex items-center gap-2 mt-1">
+            <Input
+              id="deceased_postal_code"
+              value={postalCode}
+              onChange={(e) => handlePostalCodeChange(e.target.value)}
+              placeholder="例：150-0041"
+              maxLength={8}
+              className="w-40"
+            />
+            {isLookingUp && <span className="text-xs text-gray-500">検索中...</span>}
+            {lookupError && <span className="text-xs text-red-500">{lookupError}</span>}
+          </div>
+          <p className="text-xs text-gray-400 mt-1">7桁入力で住所を自動入力します（ハイフンあり・なし両対応）</p>
         </div>
 
         <div>

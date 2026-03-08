@@ -646,4 +646,81 @@ export const TIER3_DOCUMENTS: Record<string, DocumentDefinition[]> = {
       why_needed: '障害者控除の適用根拠となります。税額を直接減額できる重要な控除。',
     },
   ],
+
+  minor_heir: [
+    {
+      id: 'mh_tokubetsu',
+      tier: 3,
+      category: 'minor_heir',
+      document_name: '特別代理人選任申立書（家庭裁判所用）',
+      obtain_from: '家庭裁判所（被相続人の最終住所地管轄）',
+      estimated_cost: '800円（収入印紙）＋郵便切手',
+      estimated_days: '1〜2ヶ月（申立から）',
+      notes:
+        '⚠️ 未成年者と法定代理人（親）が同じ相続人の場合、利益相反のため特別代理人の選任が必須。申告期限までに完了させる必要があるため、最優先で手続きを。',
+      why_needed:
+        '親と子が共同相続人の場合、親が子を代理することは利益相反となり無効。家庭裁判所が選任した特別代理人が遺産分割協議に参加します。',
+    },
+    {
+      id: 'mh_koseki_minor',
+      tier: 3,
+      category: 'minor_heir',
+      document_name: '未成年相続人の戸籍謄本（生年月日確認用）',
+      obtain_from: '本籍地市区町村窓口',
+      estimated_cost: '450円',
+      estimated_days: '即日〜数日',
+      notes: 'TIER1の相続人全員の戸籍謄本と兼用可。未成年者控除の控除額計算（18歳 − 相続時年齢）に使用。',
+      why_needed: '未成年者控除額の計算に相続開始時の年齢が必要。控除額 = （18歳 − 年齢）× 10万円。',
+    },
+  ],
+
+  small_land_business: [
+    {
+      id: 'sl_biz_kakutei',
+      tier: 3,
+      category: 'small_land',
+      document_name: '被相続人の直近3年分の確定申告書（事業所得）',
+      obtain_from: '自宅保管分または税務署に閲覧請求',
+      estimated_cost: '無料',
+      estimated_days: '即時〜1週間',
+      notes: '特定事業用宅地等の特例（最大80%減額）の適用要件として、事業を継続していたことの証明。',
+      why_needed: '被相続人が宅地で事業を営んでいたことを証明。相続人が事業を引き継ぐことが特例の要件。',
+    },
+    {
+      id: 'sl_biz_kyoka',
+      tier: 3,
+      category: 'small_land',
+      document_name: '営業許可証・開業届・事業の登録証明書',
+      obtain_from: '自宅・各許可機関',
+      estimated_cost: '無料',
+      estimated_days: '即時',
+      notes: '飲食店・理容店等は許可証、一般事業は開業届（税務署）。',
+      why_needed: '被相続人が事業を行っていたことの公的証明。',
+    },
+  ],
+
+  small_land_rental: [
+    {
+      id: 'sl_rent_keiyaku',
+      tier: 3,
+      category: 'small_land',
+      document_name: '賃貸借契約書（全テナント・全期間分）',
+      obtain_from: '自宅・不動産管理会社',
+      estimated_cost: '無料',
+      estimated_days: '即時〜1週間',
+      notes: '特定貸付事業用宅地等の特例（最大50%減額）の適用要件。相続開始日現在の賃貸状況の確認。',
+      why_needed: '貸付事業として宅地を利用していたことの証明。空室・無償貸付は特例対象外。',
+    },
+    {
+      id: 'sl_rent_tsucho',
+      tier: 3,
+      category: 'small_land',
+      document_name: '賃料入金確認通帳・明細（直近1年分）',
+      obtain_from: '自宅・金融機関',
+      estimated_cost: '無料〜数百円',
+      estimated_days: '即時〜1週間',
+      notes: '実際に賃料収入があったことを証明するため。',
+      why_needed: '貸付事業の実態確認。税務調査で賃料収入の実績確認は必須。',
+    },
+  ],
 }

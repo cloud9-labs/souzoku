@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { generateChecklist } from '@/lib/document-engine/generate-checklist'
 import { saveDevCase } from '@/lib/dev-store'
 import { encrypt, encryptJson } from '@/lib/crypto'
+import { randomBytes } from 'crypto'
 import type { HearingFormData } from '@/types/case'
 import type { DocumentDefinition } from '@/lib/document-engine/document-master'
 
@@ -86,6 +87,7 @@ export async function POST(request: NextRequest) {
       client_phone: encrypt(formData.client_phone ?? ''),
       client_address: encrypt(formData.client_address ?? ''),
       heirs: encryptJson(formData.heirs),
+      portal_token: randomBytes(18).toString('base64url'),
     })
     .select()
     .single()

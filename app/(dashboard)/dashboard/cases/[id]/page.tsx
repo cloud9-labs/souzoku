@@ -7,7 +7,7 @@ import { format, differenceInDays } from 'date-fns'
 import { ja } from 'date-fns/locale'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { ArrowLeft, Clock, Mail, Calendar, ChevronRight, Phone, MapPin, Users } from 'lucide-react'
+import { ArrowLeft, Clock, Mail, Calendar, ChevronRight, Phone, MapPin, Users, Link2 } from 'lucide-react'
 import { DocumentChecklist } from '@/components/documents/DocumentChecklist'
 import type { Case, Document } from '@/types/case'
 
@@ -28,6 +28,7 @@ export default function CaseDetailPage() {
   const [loading, setLoading] = useState(true)
   const [sendingNotif, setSendingNotif] = useState<string | null>(null)
   const [notifSent, setNotifSent] = useState<Set<string>>(new Set())
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     fetch(`/api/cases/${id}`)
@@ -89,7 +90,22 @@ export default function CaseDetailPage() {
               依頼人: {caseData.client_name} 様{caseData.client_relationship ? `（${caseData.client_relationship}）` : ''}　|　逝去日: {deathDateFormatted}
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
+            {caseData.portal_token && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const url = `${window.location.origin}/portal/${caseData.portal_token}`
+                  navigator.clipboard.writeText(url)
+                  setCopied(true)
+                  setTimeout(() => setCopied(false), 2000)
+                }}
+              >
+                <Link2 className="w-4 h-4 mr-1" />
+                {copied ? 'コピーしました！' : '書類提出URLをコピー'}
+              </Button>
+            )}
             <Button
               variant="outline"
               size="sm"

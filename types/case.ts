@@ -53,6 +53,7 @@ export interface Case {
   client_address: string
   heirs: HeirEntry[]
   status: 'active' | 'completed' | 'archived'
+  portal_token?: string
   created_at: string
   updated_at: string
 }

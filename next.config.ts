@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  outputFileTracingExcludes: {
+    '*': ['.claude/**', '.agent-trace/**', '.dev-case-store.json'],
+  },
 };
 
 export default nextConfig;

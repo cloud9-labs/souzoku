@@ -87,12 +87,18 @@ export async function POST(request: NextRequest) {
       client_phone: encrypt(formData.client_phone ?? ''),
       client_address: encrypt(formData.client_address ?? ''),
       heirs: encryptJson(formData.heirs),
-      portal_token: randomBytes(18).toString('base64url'),
     })
     .select()
     .single()
 
   if (caseError) return NextResponse.json({ error: caseError.message }, { status: 500 })
+
+  // portal_token を付与（列が存在しない場合は無視）
+  await supabase
+    .from('cases')
+    .update({ portal_token: randomBytes(18).toString('base64url') })
+    .eq('id', caseData.id)
+    .then(() => {})  // エラーは無視
 
   // documents テーブルへ一括挿入
   const documentsToInsert = checklist.map((doc) => ({

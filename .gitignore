@@ -29,6 +29,11 @@
 .mcp.json
 .agent-trace/
 
+# Internal docs (not for public)
+DEPLOYMENT.md
+research_report.md
+.dev-case-store.json
+
 # debug
 npm-debug.log*
 yarn-debug.log*

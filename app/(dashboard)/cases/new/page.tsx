@@ -1,5 +1,7 @@
 import { HearingWizard } from '@/components/hearing/HearingWizard'
 
+export const dynamic = 'force-dynamic'
+
 export default function NewCasePage() {
   return (
     <div>

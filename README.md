@@ -43,11 +43,3 @@ Supabase ダッシュボードの SQL エディタで以下を実行:
 ```
 supabase/migrations/001_initial_schema.sql
 ```
-
-## TAISUN Agent セットアップ
-
-```bash
-ln -s ~/taisun_agent/.claude .claude
-ln -s ~/taisun_agent/.mcp.json .mcp.json
-cd ~/taisun_agent && git pull origin main && npm install && npm run build:all
-```

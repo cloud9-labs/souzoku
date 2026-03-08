@@ -27,6 +27,7 @@
 # Claude Code / TAISUN Agent (symlinks - do not scan)
 .claude
 .mcp.json
+.agent-trace/
 
 # debug
 npm-debug.log*

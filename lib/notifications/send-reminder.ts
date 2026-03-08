@@ -2,8 +2,7 @@ import { Resend } from 'resend'
 import { formatJpDate } from '@/lib/utils/deadline'
 import { parseISO } from 'date-fns'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-const FROM = `${process.env.RESEND_FROM_NAME} <${process.env.RESEND_FROM_EMAIL}>`
+const FROM = `${process.env.RESEND_FROM_NAME ?? '相続書類管理'} <${process.env.RESEND_FROM_EMAIL ?? 'noreply@example.com'}>`
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL
 
 type NotificationType = 'day_7' | 'day_30' | 'day_90' | 'day_240'
@@ -101,6 +100,12 @@ ${portalUrl}
 
   const template = templates[notificationType]
 
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('RESEND_API_KEY未設定のためメール送信をスキップします')
+    return null
+  }
+
+  const resend = new Resend(process.env.RESEND_API_KEY)
   const { data, error } = await resend.emails.send({
     from: FROM,
     to: clientEmail,
